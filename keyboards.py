@@ -16,24 +16,19 @@ def get_main_menu_keyboard():
 
 
 def get_video_quality_keyboard(formats: list):
-    """Video quality selection keyboard"""
-    keyboard = []
+    """Video quality selection keyboard with reliable selectors"""
+    quality_options = [
+        ("best", "🎬 أفضل جودة (أوتوماتيكي)"),
+        ("bestvideo[height<=1080]+bestaudio/best[height<=1080]", "📹 1080p HD"),
+        ("bestvideo[height<=720]+bestaudio/best[height<=720]", "📹 720p HD"),
+        ("bestvideo[height<=480]+bestaudio/best[height<=480]", "📱 480p"),
+        ("bestvideo[height<=360]+bestaudio/best[height<=360]", "📵 360p"),
+    ]
     
-    for fmt in formats:
-        height = fmt['height']
-        label = f"{height}p"
-        
-        if height >= 1080:
-            label = "🎬 1080p HD"
-        elif height >= 720:
-            label = "📹 720p HD"
-        elif height >= 480:
-            label = "📱 480p"
-        else:
-            label = "📵 360p"
-        
+    keyboard = []
+    for selector, label in quality_options:
         keyboard.append([
-            InlineKeyboardButton(label, callback_data=f"video_{fmt['format_id']}")
+            InlineKeyboardButton(label, callback_data=f"video_{selector}")
         ])
     
     keyboard.append([InlineKeyboardButton("🔙 رجوع", callback_data="back_main")])

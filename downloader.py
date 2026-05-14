@@ -78,33 +78,37 @@ class YouTubeDownloader:
         """Download video with progress callback"""
         output_template = os.path.join(self.temp_dir, '%(title)s.%(ext)s')
         
-        ydl_opts = {
-            'format': format_id,
-            'outtmpl': output_template,
-            'maxfilesize': MAX_FILE_SIZE,
-            'timeout': DOWNLOAD_TIMEOUT,
-            'progress_hooks': [],
-            **self._get_cookies_opts(),
-        }
-        
-        if progress_callback:
-            ydl_opts['progress_hooks'] = [
-                lambda d: asyncio.create_task(
-                    progress_callback(d)
-                )
-            ]
-
-        try:
-            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        def download_with_format(fmt: str):
+            opts = {
+                'format': fmt,
+                'outtmpl': output_template,
+                'maxfilesize': MAX_FILE_SIZE,
+                'timeout': DOWNLOAD_TIMEOUT,
+                'progress_hooks': [],
+                **self._get_cookies_opts(),
+            }
+            
+            if progress_callback:
+                opts['progress_hooks'] = [
+                    lambda d: asyncio.create_task(
+                        progress_callback(d)
+                    )
+                ]
+            
+            with yt_dlp.YoutubeDL(opts) as ydl:
                 info = ydl.extract_info(url, download=True)
                 filename = ydl.prepare_filename(info)
-                
-                if os.path.exists(filename):
-                    return filename
-                return None
+                return filename if os.path.exists(filename) else None
+        
+        try:
+            return download_with_format(format_id)
         except Exception as e:
-            print(f"Download error: {e}")
-            return None
+            print(f"Format not available, trying best video: {e}")
+            try:
+                return download_with_format('bestvideo[height<=1080]+bestaudio/best[height<=1080]')
+            except Exception as e2:
+                print(f"Fallback also failed: {e2}")
+                return None
 
     async def download_audio(
         self,

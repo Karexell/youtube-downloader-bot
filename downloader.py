@@ -9,7 +9,8 @@ from config import (
     TEMP_DIR,
     MAX_FILE_SIZE,
     DOWNLOAD_TIMEOUT,
-    DOWNLOAD_PROGRESS_UPDATE
+    DOWNLOAD_PROGRESS_UPDATE,
+    YOUTUBE_COOKIES_FILE
 )
 
 
@@ -17,6 +18,13 @@ class YouTubeDownloader:
     def __init__(self):
         self.temp_dir = TEMP_DIR
         os.makedirs(self.temp_dir, exist_ok=True)
+        self.cookies_file = YOUTUBE_COOKIES_FILE if os.path.exists(YOUTUBE_COOKIES_FILE) else None
+    
+    def _get_cookies_opts(self) -> dict:
+        """Get cookies options if file exists"""
+        if self.cookies_file:
+            return {'cookiefile': self.cookies_file}
+        return {}
 
     def extract_video_info(self, url: str) -> Optional[Dict]:
         """Extract video information without downloading"""
@@ -24,6 +32,7 @@ class YouTubeDownloader:
             'quiet': True,
             'no_warnings': True,
             'format': 'best',
+            **self._get_cookies_opts(),
         }
         
         try:
@@ -75,6 +84,7 @@ class YouTubeDownloader:
             'maxfilesize': MAX_FILE_SIZE,
             'timeout': DOWNLOAD_TIMEOUT,
             'progress_hooks': [],
+            **self._get_cookies_opts(),
         }
         
         if progress_callback:
@@ -114,6 +124,7 @@ class YouTubeDownloader:
                 'preferredcodec': 'mp3',
                 'preferredquality': quality,
             }],
+            **self._get_cookies_opts(),
         }
         
         if progress_callback:

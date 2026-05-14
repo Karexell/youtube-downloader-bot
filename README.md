@@ -85,6 +85,36 @@ youtube-downloader-bot/
 └── temp/           # الملفات المؤقتة
 ```
 
+## 🔐 حل مشكلة "Please sign in"
+
+إذا واجهت خطأ "يرجى تسجيل الدخول"، اتبع الخطوات:
+
+### 1. تصدير الكوكيز من المتصفح
+
+1. ثبت إضافة **[Get cookies.txt LOCALLY](https://chrome.google.com/webstore/detail/get-cookies-txt-locally/ccleldfahkkkleeddjhbimepncpfndmk)** في كروم
+2. سجّل دخولك في يوتيوب على المتصفح
+3. اذهب لـ `youtube.com`
+4. اضغط على الإضافة → Export Cookies
+5. احفظ الملف باسم `cookies.txt`
+
+### 2. رفع الكوكيز على السيرفر
+
+**للاستضافة المحلية:**
+```bash
+cp cookies.txt .env
+```
+
+**لـ Render/Railway:**
+- أضف الملف `cookies.txt` إلى المستودع
+- أو أضف Secret File في إعدادات الاستضافة
+
+### 3. ملاحظة مهمة
+
+- الكوكيز تنتهي بعد فترة،，你需要 تجديدها
+- لا تشارك الكوكيز مع أحد
+
+---
+
 ## ⚠️ ملاحظات
 
 - الحد الأقصى لحجم الملف: 50MB
